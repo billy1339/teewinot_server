@@ -18,13 +18,16 @@ class PostsController < ApplicationController
   # POST /posts
   # POST /posts.json
   def create
-    @post = Post.new(post_params)
-
-    # self.checkPasscode
-    if @post.save
-      render json: @post, status: :created, location: @post
+    if post_params.fetch("passcode") != ENV['PASSCODE']
+      render json: :errors, status: :forbidden
     else
-      render json: @post.errors, status: :unprocessable_entity
+      @post = Post.new(post_params)
+
+      if @post.save
+        render json: @post, status: :created, location: @post
+      else
+        render json: @post.errors, status: :unprocessable_entity
+      end
     end
   end
 
